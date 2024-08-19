@@ -6,7 +6,7 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 12:27:05 by vseppane          #+#    #+#             */
-/*   Updated: 2024/08/19 16:48:23 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/08/19 16:59:04 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,15 @@ int main (int argc, char **argv)
 		return (0);
 	pid = atoi(argv[1]);
 
-    int result = kill(pid, SIGINT);
+    
+	//temp delete
+	int custom = atoi(argv[2]);
+	int result = 0;
+
+	if (custom == 2)
+		result = kill(pid, SIGUSR2);
+	else
+		result = kill(pid, SIGUSR1);
 
     if (result == 0)
 		printf("Success.\n");
