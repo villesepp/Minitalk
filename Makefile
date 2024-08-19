@@ -6,7 +6,7 @@
 #   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+          #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 13:06:17 by vseppane          #+#    #+#              #
-#    Updated: 2024/08/16 13:19:54 by vseppane         ###   ########.fr        #
+#    Updated: 2024/08/19 16:26:06 by vseppane         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,8 +28,8 @@ CFLAGS =	-Wall -Wextra -Werror
 # /____  >____/|____/ |__|   \___  >___  >____  >
 #      \/                        \/    \/     \/
 
-CLSOURCES =	src\client.c
-SRSOURCES =	src\server.c
+CLSOURCES =	client.c
+SRSOURCES =	server.c
 
 CLOBJECTS = $(CLSOURCES:.c=.o)
 SROBJECTS = $(SRSOURCES:.c=.o)
