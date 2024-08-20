@@ -16,24 +16,48 @@
 #include <stdio.h> // delete deb
 #include <signal.h>
 
-void signalHandler(int signalNumber) 
+static int bit_shiftleft_and (int num)
 {
-    printf("Received signal for 1: %d\n", signalNumber);
+	num = num << 1;
+	num = num & 1;
+	return (num);
 }
 
 
-void signalHandler2(int signalNumber) 
+static void	signal_usr(int signum) 
 {
-    printf("Received signal for 2: %d\n", signalNumber);
+	static int	bit = 0;
+	static int	value = 0;
+
+	if (signal == SIGUSR1)
+		value = bit_shiftleft_and(value, 0);
+	else
+		value = bit_shiftleft_and(value, 1);
+	bit++;
+	if (bit == 8)
+	{
+		ft_putchar(value);
+		bit = 0;
+		value = 0;
+	}
 }
+
+void signal_usr1(int signum) 
+{
+
+}
+
 
 int main (void)
 {
-	signal(SIGUSR1, signalHandler);
-	signal(SIGUSR2, signalHandler2);
-	printf("Server pid is %d\n", getpid());
+	printf("Server pid is %d, waiting for signals...\n", getpid());
 
-	while(1) ;
+	while(1)
+	{
+		signal(SIGUSR1, signal_usr);
+		signal(SIGUSR2, signal_usr);
+		pause();
+	}
 
 	return (0);
 }
