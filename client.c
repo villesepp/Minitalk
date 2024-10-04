@@ -10,92 +10,90 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minitalk.h"
 
-#include <stdio.h> // delete deb
-#include <math.h> // delete deb
-#include <stdlib.h> // for atoi so delete deb
-
-
-#include <sys/types.h> // for pid, kill
-#include <signal.h> // for pid, kill
-
-
-static void	char_send(char c, int pid)
+/*
+ *	- send signal based on the bit of c
+ *	- sleep for a moment after each signal to lessen the chance of errors
+ */
+static void	char_send_pid(int c, int pid)
 {
-	int	i;
+	int	bit;
 
-	i = 0;
-	while (i < 8)
+	bit = 0;
+	while (bit < 8)
 	{
-		if (c & 0)
+		if (c << bit & 0b10000000)
 			kill(pid, SIGUSR1);
 		else
 			kill(pid, SIGUSR2);
-		c = c >> 1;
-		usleep(100);
-		i++;
+		bit++;
+		usleep(600);
 	}
 }
 
+/*
+ *	- get the PID from the argument
+ *	- pass each character individually to other function
+ *	- send \0
+ */
 static void	string_send(char **argv)
 {
 	int	i;
+	int	pid;
 
 	i = 0;
+	pid = ft_atoi(argv[1]);
 	while (argv[2][i])
-		char_send(argv[i]);
+	{
+		char_send_pid(argv[2][i], pid);
+		i++;
+	}
+	char_send_pid(0, pid);
 }
 
-static int	check_args(int argc, char **argv)
+/*
+ *	- check if PID consists of only digits
+ *	- check if PID is within valid range on 64-bit systems
+ */
+static int	pid_check(char *str)
 {
-	int 	pid;
+	int	pid;
+	int	i;
 
-	if (argc != 3)
+	i = 0;
+	while (str[i])
 	{
-		if (argc == 2)
-			printf("\033[31mError: Missing string to send\033[0m\n"); // use putendl, with stderror
-		else if (argc > 3)
-			printf("\033[31mError: Too many arguments\033[0m\n");
-		printf("Usage: pid_number \"string to send\"\n");
-		return (1);
+		if (!ft_isdigit(str[i]))
+			return (1);
+		i++;
 	}
-	pid = atoi(argv[1]);	// deb use ft_atoi
+	pid = ft_atoi(str);
 	if (pid < 1 || pid > 4194304)
-	{
-		printf("Invalid process id\n"); // use puetndl with stderror
-		return (1);
-	}
-	if (strlen(argv[1]) > 4000) // over some max len.. check
 		return (1);
 	return (0);
 }
 
+/*
+ * - check if argument count is exactly 3
+ * - call PID check function
+ * - check if string argument is not bigger than (ARG_MAX - client - PID) bytes long
+ */
+static int	check_args(int argc, char **argv)
+{
+	if (argc != 3)
+		return (1);
+	if (pid_check(argv[1]))
+		return (1);
+	if (ft_strlen(argv[2]) > 2097140)
+		return (1);
+	return (0);
+}
 
 int main (int argc, char **argv)
 {
-	int	pid;
-
 	if (check_args(argc, argv))
 		return (-1);
-	pid = atoi(argv[1]);
-
-    string_send(argv[2]);
-
-	//temp delete
-	/*
-	int custom = atoi(argv[2]);
-	int result = 0;
-
-	if (custom == 2)
-		result = kill(pid, SIGUSR2);
-	else
-		result = kill(pid, SIGUSR1);
-
-    if (result == 0)
-		printf("Success.\n");
-	else
-		printf("Fail.\n");
-	*/
-
+    string_send(argv);
 	return (0);
 }

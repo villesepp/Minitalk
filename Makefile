@@ -17,10 +17,13 @@
 #   \_/ (____  /__|  |__(____  /___  /____/\___  >____  >
 #            \/              \/    \/          \/     \/
 
-CLNAME =	client
-SRNAME =	server
-CC =		cc
-CFLAGS =	-Wall -Wextra -Werror
+CLNAME 		:=	client
+SRNAME 		:=	server
+CC 			:=	cc
+CFLAGS		:=	-Wall -Wextra -Werror
+LFT			:=  libft/libft.a
+LIB			:=  -L ./libft -lft
+
 
 #   __________  __ _________  ____  ____   ______
 #  /  ___/  _ \|  |  \_  __ \/ ___\/ __ \ /  ___/
@@ -42,23 +45,29 @@ SROBJECTS = $(SRSOURCES:.c=.o)
 #            \/     /_____/      \/          \/ 
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $?
+			$(CC) -c $(CFLAGS) $?
 
-all: $(CLNAME) $(SRNAME)
+all: 		$(LFT) $(CLNAME) $(SRNAME)
 
-$(CLNAME): $(CLOBJECTS)
-	cc -o $@ $^
+$(LFT):
+			make -C libft bonus
 
-$(SRNAME): $(SROBJECTS)
-	cc -o $@ $^
+$(CLNAME):	$(CLOBJECTS)
+			cc -o $@ $^ $(LIB)
+
+
+$(SRNAME):	$(SROBJECTS)
+			cc -o $@ $^ $(LIB)
 
 clean:		
-	rm -f $(CLOBJECTS)
-	rm -f $(SROBJECTS)
+			make $@ -C libft
+			rm -f $(CLOBJECTS)
+			rm -f $(SROBJECTS)
 
 fclean:		clean
-	rm -f $(CLNAME)
-	rm -f $(SRNAME)
+			make $@ -C libft
+			rm -f $(CLNAME)
+			rm -f $(SRNAME)
 
 re:			fclean all
 

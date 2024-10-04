@@ -1,63 +1,73 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/13 12:27:05 by vseppane          #+#    #+#             */
-/*   Updated: 2024/08/19 16:55:11 by vseppane         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
-// for getpid 
-#include <unistd.h>
+#include "minitalk.h"
 
-#include <stdio.h> // delete deb
-#include <signal.h>
-
-static int bit_shiftleft_and (int num)
+static char	*char_append(char *str, char c)
 {
-	num = num << 1;
-	num = num & 1;
-	return (num);
+	char	*new;
+	size_t		len;
+
+	len = ft_strlen(str);
+	new = malloc(len + 2);
+	if (new == NULL)
+	{
+		free(str);
+        exit(EXIT_FAILURE);
+	}
+	ft_memcpy(new, str, len);
+	new[len] = c;
+	new[len + 1] = '\0';
+	free(str);
+	return (new);
+}
+
+static unsigned char	bit_append(int signal, unsigned char c)
+{
+	if (signal == SIGUSR2)
+		c = c << 1;
+	else if (signal == SIGUSR1)
+		c = (c << 1) | 1;
+	return (c);
 }
 
 
-static void	signal_usr(int signum) 
+static void	signal_handler(int signal)
 {
-	static int	bit = 0;
-	static int	value = 0;
+	static int				bits = 0;
+	static char				*str;
+	static unsigned char	c = 0;
 
-	if (signal == SIGUSR1)
-		value = bit_shiftleft_and(value, 0);
-	else
-		value = bit_shiftleft_and(value, 1);
-	bit++;
-	if (bit == 8)
+	c = bit_append(signal, c);
+
+	bits++;
+	if (bits == 8)
 	{
-		ft_putchar(value);
-		bit = 0;
-		value = 0;
+		if (str == NULL)
+			str = ft_strdup("");
+		if (str == NULL)
+    	    exit(EXIT_FAILURE);
+		
+		str = char_append(str, c);
+		if (c == '\0')
+		{
+			ft_putstr_fd(str, 1);
+			free (str);
+			str = NULL;
+		}
+		bits = 0;
+		c = 0;
 	}
 }
 
-void signal_usr1(int signum) 
+int	main(void)
 {
-
-}
-
-
-int main (void)
-{
-	printf("Server pid is %d, waiting for signals...\n", getpid());
-
-	while(1)
+	ft_putstr_fd("Server process id: ", 1);
+	ft_putnbr_fd(getpid(), 1);
+	ft_putendl_fd("", 1);
+	while (1)
 	{
-		signal(SIGUSR1, signal_usr);
-		signal(SIGUSR2, signal_usr);
+		signal(SIGUSR1, signal_handler);
+		signal(SIGUSR2, signal_handler);
 		pause();
 	}
-
 	return (0);
 }
