@@ -1,22 +1,33 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/04 14:37:12 by vseppane          #+#    #+#             */
+/*   Updated: 2024/10/04 17:14:06 by vseppane         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minitalk.h"
 
 static char	*char_append(char *str, char c)
 {
-	char	*new;
-	size_t		len;
+	char		*new;
+	int			len;
 
 	len = ft_strlen(str);
 	new = malloc(len + 2);
 	if (new == NULL)
 	{
 		free(str);
-        exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 	ft_memcpy(new, str, len);
 	new[len] = c;
 	new[len + 1] = '\0';
-	free(str);
+	free((void*)str);
 	return (new);
 }
 
@@ -24,32 +35,31 @@ static unsigned char	bit_append(int signal, unsigned char c)
 {
 	if (signal == SIGUSR2)
 		c = c << 1;
-	else if (signal == SIGUSR1)
+	else
 		c = (c << 1) | 1;
 	return (c);
 }
 
-
 static void	signal_handler(int signal)
 {
 	static int				bits = 0;
-	static char				*str;
 	static unsigned char	c = 0;
+	static char				*str;
 
+	if (str == NULL)
+	{
+		str = ft_strdup("");
+		if (str == NULL)
+			exit(EXIT_FAILURE);
+	}
 	c = bit_append(signal, c);
-
 	bits++;
 	if (bits == 8)
 	{
-		if (str == NULL)
-			str = ft_strdup("");
-		if (str == NULL)
-    	    exit(EXIT_FAILURE);
-		
 		str = char_append(str, c);
 		if (c == '\0')
 		{
-			ft_putstr_fd(str, 1);
+			write(1, str, ft_strlen(str));
 			free (str);
 			str = NULL;
 		}
@@ -58,8 +68,11 @@ static void	signal_handler(int signal)
 	}
 }
 
-int	main(void)
+int	main(int argc, char **argv)
 {
+	(void)argv;
+	if (argc != 1)
+		exit(EXIT_FAILURE);
 	ft_putstr_fd("Server process id: ", 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putendl_fd("", 1);

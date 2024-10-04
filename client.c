@@ -6,7 +6,7 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 12:27:05 by vseppane          #+#    #+#             */
-/*   Updated: 2024/08/19 16:59:04 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/04 17:14:36 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static void	char_send_pid(int c, int pid)
 		else
 			kill(pid, SIGUSR2);
 		bit++;
-		usleep(600);
+		usleep(750);
 	}
 }
 
@@ -77,7 +77,7 @@ static int	pid_check(char *str)
 /*
  * - check if argument count is exactly 3
  * - call PID check function
- * - check if string argument is not bigger than (ARG_MAX - client - PID) bytes long
+ * - check if string argument is not over (ARG_MAX - client - PID) bytes long
  */
 static int	check_args(int argc, char **argv)
 {
@@ -90,10 +90,10 @@ static int	check_args(int argc, char **argv)
 	return (0);
 }
 
-int main (int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	if (check_args(argc, argv))
 		return (-1);
-    string_send(argv);
+	string_send(argv);
 	return (0);
 }
