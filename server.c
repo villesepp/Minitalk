@@ -6,7 +6,7 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 14:37:12 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/06 16:16:53 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/06 17:46:44 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,12 @@
 /*
  * - send acknowledgement of signal received
  */
-static void ack_send(int pid, int signal)
+static void	ack_send(int pid, int signal)
 {
-	// printf("SRV send ack to client pid: %d\n", pid);
 	if (signal == 0)
-		kill(pid, SIGUSR1);	
+		kill(pid, SIGUSR1);
 	if (signal == 1)
-		kill(pid, SIGUSR2);	
-
+		kill(pid, SIGUSR2);
 }
 
 static char	*char_append(char *str, char c)
@@ -60,7 +58,6 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 	static char				*str;
 	int						client_pid;
 
-	// printf("SRV signal handler\n");
 	usleep(SLEEPTIME);
 	(void)context;
 	client_pid = info->si_pid;
@@ -88,37 +85,21 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 	ack_send(client_pid, 0);
 }
 
-static void args_check(int argc, char **argv)
-{
-	(void) argv;
-	if (argc != 1)
-		exit(EXIT_FAILURE);
-	ft_putstr_fd("Server process id: ", 1);
-	ft_putnbr_fd(getpid(), 1);
-	ft_putendl_fd("", 1);
-}
-
-
-
-int	main(int argc, char **argv)
+int	main(void)
 {
 	struct sigaction	sa;
 	int					signal_received;
 
+	ft_putstr_fd("Server process id: ", 1);
+	ft_putnbr_fd(getpid(), 1);
+	ft_putendl_fd("", 1);
 	signal_received = 0;
-
-	args_check(argc, argv);
-
 	sigemptyset(&sa.sa_mask);
 	sa.sa_sigaction = signal_handler;
 	sa.sa_flags = SA_SIGINFO | SA_RESTART;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
-
-	// printf("SRV after sigaction\n");
 	while (1)
-	{
 		pause();
-	}
 	return (0);
 }
