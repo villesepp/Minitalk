@@ -6,7 +6,7 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 14:37:12 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/06 17:46:44 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/06 17:54:58 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static char	*char_append(char *str, char c)
 	ft_memcpy(new, str, len);
 	new[len] = c;
 	new[len + 1] = '\0';
-	free((void*)str);
+	free (str);
 	return (new);
 }
 
