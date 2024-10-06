@@ -6,7 +6,7 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 14:37:12 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/06 14:14:21 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/06 16:16:53 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,14 @@
 /*
  * - send acknowledgement of signal received
  */
-static void ack_send(int pid)
+static void ack_send(int pid, int signal)
 {
-	printf("SRV send ack to client pid: %d\n", pid);
-	kill(pid, SIGUSR1);
+	// printf("SRV send ack to client pid: %d\n", pid);
+	if (signal == 0)
+		kill(pid, SIGUSR1);	
+	if (signal == 1)
+		kill(pid, SIGUSR2);	
+
 }
 
 static char	*char_append(char *str, char c)
@@ -56,7 +60,8 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 	static char				*str;
 	int						client_pid;
 
-	printf("SRV signal handler\n");
+	// printf("SRV signal handler\n");
+	usleep(SLEEPTIME);
 	(void)context;
 	client_pid = info->si_pid;
 	if (str == NULL)
@@ -67,7 +72,6 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 	}
 	c = bit_append(signal, c);
 	bits++;
-	ack_send(client_pid);
 	if (bits == 8)
 	{
 		str = char_append(str, c);
@@ -76,10 +80,12 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 			write(1, str, ft_strlen(str));
 			free (str);
 			str = NULL;
+			ack_send(client_pid, 1);
 		}
 		bits = 0;
 		c = 0;
 	}
+	ack_send(client_pid, 0);
 }
 
 static void args_check(int argc, char **argv)
@@ -92,9 +98,14 @@ static void args_check(int argc, char **argv)
 	ft_putendl_fd("", 1);
 }
 
+
+
 int	main(int argc, char **argv)
 {
 	struct sigaction	sa;
+	int					signal_received;
+
+	signal_received = 0;
 
 	args_check(argc, argv);
 
@@ -104,7 +115,7 @@ int	main(int argc, char **argv)
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
 
-	printf("SRV after sigaction\n");
+	// printf("SRV after sigaction\n");
 	while (1)
 	{
 		pause();
