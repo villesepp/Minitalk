@@ -6,22 +6,11 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 14:37:12 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/06 17:54:58 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/10 13:57:56 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
-
-/*
- * - send acknowledgement of signal received
- */
-static void	ack_send(int pid, int signal)
-{
-	if (signal == 0)
-		kill(pid, SIGUSR1);
-	if (signal == 1)
-		kill(pid, SIGUSR2);
-}
 
 static char	*char_append(char *str, char c)
 {
@@ -51,6 +40,25 @@ static unsigned char	bit_append(int signal, unsigned char c)
 	return (c);
 }
 
+
+void char_process(unsigned char *c, int *bits, int *client_pid, char **str)
+{
+    *str = char_append(*str, *c);
+    if (*c == '\0')
+	{
+        write(1, *str, ft_strlen(*str));
+		ft_putstr_fd("\nMessage received lenght was: ", 1);
+		ft_putnbr_fd(ft_strlen(*str), 1);
+		ft_putendl_fd("", 1);
+        free(*str);
+        *str = NULL;
+        ack_send(*client_pid, 1);
+    }
+    *bits = 0;
+    *c = 0;
+}
+
+
 static void	signal_handler(int signal, siginfo_t *info, void *context)
 {
 	static int				bits = 0;
@@ -70,30 +78,17 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 	c = bit_append(signal, c);
 	bits++;
 	if (bits == 8)
-	{
-		str = char_append(str, c);
-		if (c == '\0')
-		{
-			write(1, str, ft_strlen(str));
-			free (str);
-			str = NULL;
-			ack_send(client_pid, 1);
-		}
-		bits = 0;
-		c = 0;
-	}
+		char_process(&c, &bits, &client_pid, &str);
 	ack_send(client_pid, 0);
 }
 
 int	main(void)
 {
 	struct sigaction	sa;
-	int					signal_received;
 
 	ft_putstr_fd("Server process id: ", 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putendl_fd("", 1);
-	signal_received = 0;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_sigaction = signal_handler;
 	sa.sa_flags = SA_SIGINFO | SA_RESTART;

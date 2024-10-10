@@ -6,7 +6,7 @@
 #   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+          #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 13:06:17 by vseppane          #+#    #+#              #
-#    Updated: 2024/08/19 16:26:06 by vseppane         ###   ########.fr        #
+#    Updated: 2024/10/10 13:54:45 by vseppane         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ LIB			:=  -L ./libft -lft
 #      \/                        \/    \/     \/
 
 CLSOURCES =	client.c
-SRSOURCES =	server.c
+SRSOURCES =	server.c \ server_utils.c
 
 CLOBJECTS = $(CLSOURCES:.c=.o)
 SROBJECTS = $(SRSOURCES:.c=.o)
