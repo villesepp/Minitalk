@@ -6,12 +6,15 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 14:37:12 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/10 13:57:56 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/10 15:23:39 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
+/*
+ * - malloc and add a new char to str
+ */
 static char	*char_append(char *str, char c)
 {
 	char		*new;
@@ -31,6 +34,9 @@ static char	*char_append(char *str, char c)
 	return (new);
 }
 
+/*
+ * - shift bit to left and use '1' mask if SIGUSR1
+ */
 static unsigned char	bit_append(int signal, unsigned char c)
 {
 	if (signal == SIGUSR2)
@@ -40,25 +46,33 @@ static unsigned char	bit_append(int signal, unsigned char c)
 	return (c);
 }
 
-
-void char_process(unsigned char *c, int *bits, int *client_pid, char **str)
+/*
+ * - add c to string
+ * - print, free string if done
+ * - send ack
+ * - reset bit count and c
+ */
+void	char_process(unsigned char *c, int *bits, int *client_pid, char **str)
 {
-    *str = char_append(*str, *c);
-    if (*c == '\0')
+	*str = char_append(*str, *c);
+	if (*c == '\0')
 	{
-        write(1, *str, ft_strlen(*str));
+		ft_putstr_fd(*str, 1);
 		ft_putstr_fd("\nMessage received lenght was: ", 1);
 		ft_putnbr_fd(ft_strlen(*str), 1);
 		ft_putendl_fd("", 1);
-        free(*str);
-        *str = NULL;
-        ack_send(*client_pid, 1);
-    }
-    *bits = 0;
-    *c = 0;
+		free(*str);
+		*str = NULL;
+		ack_send(*client_pid, 1);
+	}
+	*bits = 0;
+	*c = 0;
 }
 
-
+/*
+ * - initialize string if necessary
+ * - append bit to c
+ */
 static void	signal_handler(int signal, siginfo_t *info, void *context)
 {
 	static int				bits = 0;
@@ -66,7 +80,6 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 	static char				*str;
 	int						client_pid;
 
-	usleep(SLEEPTIME);
 	(void)context;
 	client_pid = info->si_pid;
 	if (str == NULL)
@@ -82,6 +95,11 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 	ack_send(client_pid, 0);
 }
 
+/*
+ * - print server ID
+ * - initialize signals
+ * - pause in a loop to wait for signals
+ */
 int	main(void)
 {
 	struct sigaction	sa;

@@ -6,32 +6,37 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 12:27:05 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/10 13:52:38 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/10 15:24:18 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
+static int	g_ack;
+
 /*
- *	- wait for the signal to continue
+ *	- receive 'acknowledge' signal and switch the global variable
+ *	- exit the client
  */
 static void	signal_handler(int signal)
 {
 	if (signal == SIGUSR1)
+	{
 		(void) signal;
+		g_ack = 1;
+	}
 	if (signal == SIGUSR2)
 		exit (EXIT_SUCCESS);
 }
 
 /*
  *	- send signal based on the bit of c
- *	- sleep for a moment after each signal to lessen the chance of errors
+ *	- wait for signal from server or else stop and exit
  */
 static void	char_send(int c, int pid)
 {
 	int	bit;
 
-	usleep(SLEEPTIME);
 	bit = 0;
 	while (bit < 8)
 	{
@@ -40,7 +45,16 @@ static void	char_send(int c, int pid)
 		else
 			kill(pid, SIGUSR2);
 		bit++;
-		pause();
+		while (!g_ack)
+		{
+			sleep(TIMEOUT_LIMIT);
+			if (!g_ack)
+			{
+				ft_putendl_fd("Server stopped responding\n", 2);
+				exit (EXIT_FAILURE);
+			}
+		}
+		g_ack = 0;
 	}
 }
 
@@ -89,12 +103,19 @@ static int	pid_check(char *str)
 	return (0);
 }
 
+/*
+ * - check args
+ * - initialize signals
+ */
 int	main(int argc, char **argv)
 {
 	struct sigaction	sa;
 
 	if (argc != 3 || pid_check(argv[1]) || ft_strlen(argv[2]) > 2097140)
+	{
+		ft_putendl_fd("Usage: ./client SERVER_PID 'string to transmit'", 2);
 		exit (EXIT_FAILURE);
+	}
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
 	sa.sa_handler = signal_handler;
