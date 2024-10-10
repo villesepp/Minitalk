@@ -6,7 +6,7 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 12:27:05 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/10 15:24:18 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/10 15:37:39 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,10 @@ static void	signal_handler(int signal)
 		g_ack = 1;
 	}
 	if (signal == SIGUSR2)
-		exit (EXIT_SUCCESS);
+	{
+		ft_putendl_fd("Server sent SIGUSR2, exiting\n", 2);
+		exit (EXIT_FAILURE);
+	}
 }
 
 /*

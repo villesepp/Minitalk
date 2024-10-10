@@ -6,7 +6,7 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 14:37:12 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/10 15:23:39 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/10 15:44:15 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*
  * - malloc and add a new char to str
  */
-static char	*char_append(char *str, char c)
+static char	*char_append(char *str, char c, int client_pid)
 {
 	char		*new;
 	int			len;
@@ -25,6 +25,7 @@ static char	*char_append(char *str, char c)
 	if (new == NULL)
 	{
 		free(str);
+		signal_client(client_pid, 1);
 		exit(EXIT_FAILURE);
 	}
 	ft_memcpy(new, str, len);
@@ -52,9 +53,9 @@ static unsigned char	bit_append(int signal, unsigned char c)
  * - send ack
  * - reset bit count and c
  */
-void	char_process(unsigned char *c, int *bits, int *client_pid, char **str)
+void	char_process(unsigned char *c, int *bits, char **str, int client_pid)
 {
-	*str = char_append(*str, *c);
+	*str = char_append(*str, *c, client_pid);
 	if (*c == '\0')
 	{
 		ft_putstr_fd(*str, 1);
@@ -63,7 +64,6 @@ void	char_process(unsigned char *c, int *bits, int *client_pid, char **str)
 		ft_putendl_fd("", 1);
 		free(*str);
 		*str = NULL;
-		ack_send(*client_pid, 1);
 	}
 	*bits = 0;
 	*c = 0;
@@ -86,13 +86,16 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 	{
 		str = ft_strdup("");
 		if (str == NULL)
+		{
 			exit(EXIT_FAILURE);
+			signal_client(client_pid, 1);
+		}
 	}
 	c = bit_append(signal, c);
 	bits++;
 	if (bits == 8)
-		char_process(&c, &bits, &client_pid, &str);
-	ack_send(client_pid, 0);
+		char_process(&c, &bits, &str, client_pid);
+	signal_client(client_pid, 0);
 }
 
 /*
