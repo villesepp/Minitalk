@@ -95,6 +95,7 @@ static void	signal_handler(int signal, siginfo_t *info, void *context)
 	bits++;
 	if (bits == 8)
 		char_process(&c, &bits, &str, client_pid);
+	usleep(100);
 	signal_client(client_pid, 0);
 }
 
