@@ -33,16 +33,27 @@ static void	signal_handler(int signal)
 }
 
 /*
+ * - a little animation
+ */
+static void spinner(void)
+{
+	static int		i = 0;
+	char			spinner[] = {'/', '-', '\\', '|'};
+
+	ft_putstr_fd("Sending: ", 1);
+	ft_putchar_fd(spinner[i], 1);
+    ft_putchar_fd('\r', 1);
+	i = (i + 1) % sizeof(spinner);
+}
+
+/*
  *	- send signal based on the bit of c
  *	- wait for signal from server or else stop and exit
  */
 static void	char_send(int c, int pid)
 {
-	int		bit;
-	int		i
-	char	spinner[] = {'/', '-', '\\', '|'};
+	int	bit;
 
-	i = 0;
 	bit = 0;
 	while (bit < 8)
 	{
@@ -53,11 +64,7 @@ static void	char_send(int c, int pid)
 		bit++;
 		while (!g_ack)
 		{
-			ft_putstr_fd("Sending: ", 1);
-			ft_putchar_fd(spinner[i], 1);
-        	ft_putchar_fd('\r', 1);
-			i = (i + 1) % sizeof(spinner);
-
+			spinner();
 			sleep(TIMEOUT_LIMIT);
 			if (!g_ack)
 			{
@@ -90,28 +97,6 @@ static void	string_send(char **argv)
 		i++;
 	}
 	char_send(0, pid);
-}
-
-/*
- *	- check if PID consists of only digits
- *	- check if PID is within valid range on 64-bit systems
- */
-static int	pid_check(char *str)
-{
-	int	pid;
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (!ft_isdigit(str[i]))
-			return (1);
-		i++;
-	}
-	pid = ft_atoi(str);
-	if (pid < 1 || pid > 4194304)
-		return (1);
-	return (0);
 }
 
 /*

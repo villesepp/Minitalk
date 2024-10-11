@@ -31,7 +31,7 @@ LIB			:=  -L ./libft -lft
 # /____  >____/|____/ |__|   \___  >___  >____  >
 #      \/                        \/    \/     \/
 
-CLSOURCES =	client.c
+CLSOURCES =	client.c \ client_utils.c
 SRSOURCES =	server.c \ server_utils.c
 
 CLOBJECTS = $(CLSOURCES:.c=.o)

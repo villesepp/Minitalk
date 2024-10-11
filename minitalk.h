@@ -21,5 +21,6 @@
 # include <stdlib.h>
 
 void    signal_client(int pid, int signal);
+int		pid_check(char *str);
 
 #endif
