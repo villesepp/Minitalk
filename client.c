@@ -38,16 +38,14 @@ static void	signal_handler(int signal)
  */
 static void	char_send(int c, int pid)
 {
-	int	bit;
+	int		bit;
+	int		i
+	char	spinner[] = {'/', '-', '\\', '|'};
 
-
-	char spinner[] = {'/', '-', '\\', '|'};
-    int i = 0;
-
+	i = 0;
 	bit = 0;
 	while (bit < 8)
 	{
-		//usleep(100);
 		if (c << bit & 0b10000000)
 			kill(pid, SIGUSR1);
 		else
@@ -55,7 +53,7 @@ static void	char_send(int c, int pid)
 		bit++;
 		while (!g_ack)
 		{
-			ft_putstr_fd("Transmitting: ", 1);
+			ft_putstr_fd("Sending: ", 1);
 			ft_putchar_fd(spinner[i], 1);
         	ft_putchar_fd('\r', 1);
 			i = (i + 1) % sizeof(spinner);
