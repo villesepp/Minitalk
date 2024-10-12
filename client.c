@@ -6,7 +6,7 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 12:27:05 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/10 15:37:39 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/12 12:35:54 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,14 @@ static void	signal_handler(int signal)
 /*
  * - a little animation
  */
-static void spinner(void)
+static void	spinner(void)
 {
 	static int		i = 0;
-	char			spinner[] = {'/', '-', '\\', '|'};
+	const char		spinner[] = {'/', '-', '\\', '|'};
 
 	ft_putstr_fd("Sending: ", 1);
 	ft_putchar_fd(spinner[i], 1);
-    ft_putchar_fd('\r', 1);
+	ft_putchar_fd('\r', 1);
 	i = (i + 1) % sizeof(spinner);
 }
 
@@ -86,7 +86,7 @@ static void	string_send(char **argv)
 	int	i;
 	int	pid;
 
-	ft_putstr_fd("Sending a string with character count: ", 1);
+	ft_putstr_fd("Sending a string with length: ", 1);
 	ft_putnbr_fd(ft_strlen(argv[2]), 1);
 	ft_putendl_fd("\n", 1);
 	i = 0;

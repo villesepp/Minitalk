@@ -6,7 +6,7 @@
 /*   By: vseppane <vseppane@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 14:37:12 by vseppane          #+#    #+#             */
-/*   Updated: 2024/10/10 15:44:15 by vseppane         ###   ########.fr       */
+/*   Updated: 2024/10/12 11:02:12 by vseppane         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	char_process(unsigned char *c, int *bits, char **str, int client_pid)
 	if (*c == '\0')
 	{
 		ft_putstr_fd(*str, 1);
-		ft_putstr_fd("\nMessage received lenght was: ", 1);
+		ft_putstr_fd("\nReceived string length is: ", 1);
 		ft_putnbr_fd(ft_strlen(*str), 1);
 		ft_putendl_fd("", 1);
 		free(*str);
